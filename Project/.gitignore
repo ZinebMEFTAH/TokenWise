@@ -1,0 +1,13 @@
+# Model weights (GGUF files are ~1 GB: never commit them)
+models/*
+!models/.gitkeep
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+
+# Local secrets (API keys)
+.env
