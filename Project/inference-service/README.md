@@ -33,3 +33,17 @@ curl -s localhost:8000/generate -H 'Content-Type: application/json' -d '{"questi
 ```
 
 API mode: `LLM_BASE_URL=https://api.openai.com/v1 LLM_MODEL=<model> LLM_API_KEY=<key>`.
+
+## Run with Docker
+
+Image: `ethica79/inference-service:1.0` (python:3.12-slim, non-root user, port 8080).
+
+```bash
+docker build -t ethica79/inference-service:1.0 .
+# both containers on one network, so the adapter reaches llama.cpp by name
+# (inside a container, "localhost" is the container itself)
+docker network create tokenwise
+docker network connect tokenwise llama-server
+docker run -d --name inference-service --network tokenwise -p 8000:8080 \
+  -e LLM_BASE_URL=http://llama-server:8080/v1 ethica79/inference-service:1.0
+```
