@@ -71,8 +71,8 @@ Split: **AI part** (cache-service, embeddings, threshold eval, inference, specul
 - [ ] Both modes work: local llama.cpp and external API
 - [x] Dockerfile for the adapter (python:3.12-slim, non-root `appuser`, port 8080, .dockerignore); image `ethica79/inference-service:1.0` (217 MB) built and tested on a Docker network with llama-server (model stays mounted, not in the image)
 - [x] Image pushed to Docker Hub: `ethica79/inference-service:1.0` (public)
-- [ ] Deployment (liveness/readiness on `/health`) + Service (port 80 → 8080) on minikube
-- [ ] Screenshots
+- [x] Deployments + Services (port 80 → 8080) on minikube, namespace `tokenwise`: `inference-service` (2 replicas, liveness `/health`, readiness `/ready`, ConfigMap + optional Secret) and `llama-server` (PVC + init container that downloads the model once). Tested: self-healing, model reused from PVC after pod deletion
+- [ ] Screenshots for the report (`kubectl get pods`, a `/generate` answer, a deleted pod coming back)
 
 ## Weeks 3–4: gateway + cache-service + database (→ 14/20, 16/20)
 
@@ -142,3 +142,4 @@ Split: **AI part** (cache-service, embeddings, threshold eval, inference, specul
 | 2026-11-24 | Step 1c done: `Project/inference-service/` (main.py, requirements.txt, README). Tested against local llama-server: generate OK (~0.6 s), 422 on empty question, 503 /ready + 502 /generate when backend stopped, Swagger on /docs. Committed `df5894a` (layout `9119ef8` already pushed). API mode not tested (no key). Next 1d: Dockerfile + push to Docker Hub. |
 | 2026-11-24 | Step 1d: Dockerfile + .dockerignore, image `ethica79/inference-service:1.0` built and tested (adapter + llama-server on Docker network `tokenwise`, called by name; /ready 503 with default localhost shows liveness vs readiness). Not committed, not pushed yet. Idea: move GitHub Actions (build + push to Docker Hub) right after step 1e so both members get images automatically. Next: user pushes image, then 1e minikube. |
 | 2026-11-24 | Image `ethica79/inference-service:1.0` pushed to Docker Hub (public). Roadmap moved into the repo (`Project/ROADMAP.md`) so both members can see and edit it; proposal PDF in `Project/docs/`. Next: 1e minikube. |
+| 2026-11-24 | Step 1e done: `k8s/` (namespace, llama-server, inference-service + README). Readiness kept inference pods out of traffic while llama.cpp started (no restarts). Found CPU throttling: llama.cpp started 20 threads under a 4-CPU limit → 10–12 s per answer; `-t 4` → 1.6–2 s. Self-healing and PVC reuse checked. **10/20 level reached.** Next: screenshots, then GitHub Actions (build + push images), then gateway + cache-service. |

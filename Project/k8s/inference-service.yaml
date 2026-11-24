@@ -1,0 +1,69 @@
+# inference-service: FastAPI adapter in front of the model.
+# The backend is chosen here, in the ConfigMap (local llama.cpp or external API);
+# the API key, if any, comes from the optional Secret "llm-api-key".
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: inference-config
+  namespace: tokenwise
+data:
+  LLM_BASE_URL: http://llama-server/v1
+  LLM_MODEL: qwen2.5-1.5b-instruct
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inference-service
+  namespace: tokenwise
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: inference-service
+  template:
+    metadata:
+      labels:
+        app: inference-service
+    spec:
+      containers:
+        - name: inference-service
+          image: ethica79/inference-service:1.0
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: inference-config
+            - secretRef:
+                name: llm-api-key
+                optional: true
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: inference-service
+  namespace: tokenwise
+spec:
+  type: NodePort
+  selector:
+    app: inference-service
+  ports:
+    - port: 80
+      targetPort: 8080

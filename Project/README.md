@@ -11,7 +11,7 @@ Binôme: Zineb Meftah, Therence Thai. M1 MLSD, Programmation distribuée (Benoî
 | `inference-service/` | FastAPI adapter in front of the model: local llama.cpp or external OpenAI-compatible API |
 | `gateway/` | *(to come)* entry point: API keys, quotas, cache then model, usage log |
 | `cache-service/` | *(to come)* embeddings + pgvector nearest-neighbour search |
-| `k8s/` | Kubernetes and Istio manifests |
+| `k8s/` | Kubernetes and Istio manifests ([how to deploy](k8s/README.md)) |
 | `models/` | GGUF model files, downloaded locally, not committed |
 | `docs/` | Project proposal (PDF) |
 
