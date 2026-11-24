@@ -13,3 +13,6 @@ Binôme: Zineb Meftah, Therence Thai. M1 MLSD, Programmation distribuée (Benoî
 | `cache-service/` | *(to come)* embeddings + pgvector nearest-neighbour search |
 | `k8s/` | Kubernetes and Istio manifests |
 | `models/` | GGUF model files, downloaded locally, not committed |
+| `docs/` | Project proposal (PDF) |
+
+Progress and plan: [ROADMAP.md](ROADMAP.md) (tick boxes and add a log line when you finish something).
